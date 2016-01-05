@@ -4,7 +4,6 @@
 #include <stddef.h>
 #include <memory>
 #include <set>
-#include <map>
 
 template<typename K, typename V>
 class PriorityQueue{
