@@ -28,8 +28,8 @@ class PriorityQueue{
         struct compareVK{
             bool operator() (const std::shared_ptr<std::pair<K,V>>& lhs,
             const std::shared_ptr<std::pair<K,V>>& rhs) const{
-                return (lhs->pair.second == rhs->pair.second) ?
-                    lhs->pair.first < rhs->pair.first : lhs->pair.second < rhs->pair.second;
+                return (lhs->second == rhs->second) ?
+                    lhs->first < rhs->first : lhs->second < rhs->second;
             }
         };
 
