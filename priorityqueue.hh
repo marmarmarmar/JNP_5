@@ -239,20 +239,27 @@ void PriorityQueue<K,V>::changeValue(const K& key, const V& value){
     insert(key, value);
 }
 
-/*
+
 template<typename K, typename V>
-void merge(PriorityQueue<K, V>& queue){
+void PriorityQueue<K,V>::merge(PriorityQueue<K, V>& queue){
+    if(queue.empty())
+        return;
+    auto it_K_curr = queue.sortedSetKC.begin();
+    auto it_K_next = ++it_K_curr;
+    while(queue.size() > 0){
+        auto it_VKC = queue.sortedSetVKC.find(*it_K_curr);
 
+        auto copy_curr_ptr(*it_K_curr);
+        queue.sortedSetKC.erase(it_K_curr);
+        queue.sortedSetVKC.erase(it_VKC);
+        copy_curr_ptr->counter = inserted;
+        ++inserted;
+        sortedSetVKC.insert(copy_curr_ptr);
+        sortedSetKC.insert(copy_curr_ptr);
+        it_K_curr = it_K_next;
+        ++it_K_next;
+    }
 }
-*/
-
-
-
-
-
-
-
-
 
 
 
