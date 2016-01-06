@@ -239,12 +239,12 @@ void PriorityQueue<K,V>::changeValue(const K& key, const V& value) {
 
     auto it = sortedSetKV.lower_bound(ptr);
     if (this->empty() ||
-        !((it != sortedSetKV.end() && (*it)->key == k) ||
-        (it != sortedSetKV.begin() && (*(--it))->key == k))) {
+        !((it != sortedSetKV.end() && (*it)->key == key) ||
+        (it != sortedSetKV.begin() && (*(--it))->key == key))) {
         throw PriorityQueueNotFoundException();
     }
 
-    (*it)->value = value;
+    (*it)->val = value;
 
 }
 
