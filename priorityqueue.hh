@@ -243,7 +243,6 @@ void PriorityQueue<K,V>::changeValue(const K& key, const V& value) {
         (it != sortedSetKV.begin() && (*(--it))->key == key))) {
         throw PriorityQueueNotFoundException();
     }
-
     (*it)->val = value;
 
 }
@@ -252,15 +251,20 @@ template<typename K, typename V>
 void PriorityQueue<K,V>::merge(PriorityQueue<K, V>& queue) {
     if (queue.empty())
         return;
-    auto it_KV_curr = queue.sortedSetKV.begin(); while (queue.size() > 0) {
-        it_KV_curr = queue.sortedSetKV.begin();
-        auto it_VK = queue.sortedSetVK.find(*it_KV_curr);
-        auto copy_curr_ptr(*it_KV_curr);
-        queue.sortedSetKV.erase(it_KV_curr);
-        queue.sortedSetVK.erase(it_VK);
-        sortedSetVK.insert(copy_curr_ptr);
-        sortedSetKV.insert(copy_curr_ptr);
+
+    PriorityQueue<K, V> new_one(*this);
+
+    for (auto iterator = queue.sortedSetVK.begin();
+        iterator != queue.sortedSetVK.end();
+        ++iterator) {
+
+      new_one.sortedSetVK.insert(*iterator);
+      new_one.sortedSetKV.insert(*iterator);
+
     }
+
+    queue = PriorityQueue<K, V>();
+    this->swap(new_one); 
 }
 
 template<typename K, typename V>
