@@ -233,10 +233,9 @@ void PriorityQueue<K,V>::deleteMax() {
 
 /* COMPLEXITY - O(log(size(this))) */
 template<typename K, typename V>
-void PriorityQueue<K,V>::deleteKey(const K& k) {
-    static V dummyV;
+void PriorityQueue<K,V>::changeValue(const K& key, const V& value) {
     std::shared_ptr<pairKV> ptr =
-        std::make_shared<pairKV>(k, dummyV);
+        std::make_shared<pairKV>(key, value);
 
     auto it = sortedSetKV.lower_bound(ptr);
     if (this->empty() ||
@@ -244,25 +243,16 @@ void PriorityQueue<K,V>::deleteKey(const K& k) {
         (it != sortedSetKV.begin() && (*(--it))->key == k))) {
         throw PriorityQueueNotFoundException();
     }
-    auto itVK = sortedSetVK.find(*it);
 
-    sortedSetVK.erase(itVK);
-    sortedSetKV.erase(it);
-}
+    (*it)->value = value;
 
-/* COMPLEXITY - O(log(size(this))) */
-template<typename K, typename V>
-void PriorityQueue<K,V>::changeValue(const K& key, const V& value) {
-    deleteKey(key);
-    insert(key, value);
 }
 
 template<typename K, typename V>
 void PriorityQueue<K,V>::merge(PriorityQueue<K, V>& queue) {
     if (queue.empty())
         return;
-    auto it_KV_curr = queue.sortedSetKV.begin();
-    while (queue.size() > 0) {
+    auto it_KV_curr = queue.sortedSetKV.begin(); while (queue.size() > 0) {
         it_KV_curr = queue.sortedSetKV.begin();
         auto it_VK = queue.sortedSetVK.find(*it_KV_curr);
         auto copy_curr_ptr(*it_KV_curr);
