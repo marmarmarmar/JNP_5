@@ -67,18 +67,22 @@ class PriorityQueue{
             }
         };
 
-        struct compareKC{
+        struct compareKVC{
             bool operator() (const std::shared_ptr<triple>& lhs,
             const std::shared_ptr<triple>& rhs) const{
                 if(lhs->key < rhs->key)
                     return true;
                 else if(lhs->key > rhs->key)
                     return false;
+                if(lhs->val < rhs->val)
+                    return true;
+                else if(lhs->val > rhs->val)
+                    return false;
                 return lhs->counter < rhs->counter;
             }
         };
         std::set<std::shared_ptr<triple>, compareVKC> sortedSetVKC;
-        std::set<std::shared_ptr<triple>, compareKC> sortedSetKC;
+        std::set<std::shared_ptr<triple>, compareKC> sortedSetKVC;
 
 
 };
@@ -252,17 +256,12 @@ void PriorityQueue<K,V>::merge(PriorityQueue<K, V>& queue){
         auto copy_curr_ptr(*it_K_curr);
         queue.sortedSetKC.erase(it_K_curr);
         queue.sortedSetVKC.erase(it_VKC);
-        copy_curr_ptr->counter = inserted;
-        ++inserted;
         sortedSetVKC.insert(copy_curr_ptr);
         sortedSetKC.insert(copy_curr_ptr);
         it_K_curr = it_K_next;
         ++it_K_next;
     }
 }
-
-
-
 
 template<typename K, typename V>
 void PriorityQueue<K,V>::swap(PriorityQueue<K, V>& queue){
@@ -275,6 +274,10 @@ void PriorityQueue<K,V>::swap(PriorityQueue<K, V>& queue){
     }
 }
 
+template<typename K, typename V>
+void swap(PriorityQueue<K,V>& lp, PriorityQueue<K,V>& rp){
+    lp.swap(rp);
+}
 
 #endif /* PRIORITYQUEUE_HH_ */
 
