@@ -159,7 +159,7 @@ typename PriorityQueue<K,V>::size_type PriorityQueue<K,V>::size() const {
     return sortedSetVK.size();
 }
 
-/* COMPLEXIT : O(log(size(this))) : */
+/* COMPLEXITY : O(log(size(this))) : */
 template<typename K, typename V>
 void PriorityQueue<K,V>::insert(const K& key, const V& value) {
     auto ptr = std::make_shared<pairKV>(key, value);
@@ -172,6 +172,7 @@ void PriorityQueue<K,V>::insert(const K& key, const V& value) {
     }
 }
 
+/* COMPLEXITY - O(1) */
 template<typename K, typename V>
 const V& PriorityQueue<K,V>::minValue() const {
     if (sortedSetVK.empty()) {
@@ -180,6 +181,7 @@ const V& PriorityQueue<K,V>::minValue() const {
     return (*sortedSetVK.begin())->val;
 }
 
+/* COMPLEXITY - O(1) */
 template<typename K, typename V>
 const V& PriorityQueue<K,V>::maxValue() const {
     if (sortedSetVK.empty()) {
@@ -188,7 +190,7 @@ const V& PriorityQueue<K,V>::maxValue() const {
     return (*sortedSetVK.rbegin())->val;
 }
 
-
+/* COMPLEXITY - O(1) */
 template<typename K, typename V>
 const K& PriorityQueue<K,V>::minKey() const {
     if (sortedSetVK.empty()) {
@@ -197,6 +199,7 @@ const K& PriorityQueue<K,V>::minKey() const {
     return (*sortedSetVK.begin())->key;
 }
 
+/* COMPLEXITY - O(1) */
 template<typename K, typename V>
 const K& PriorityQueue<K,V>::maxKey() const {
     if (sortedSetVK.empty()) {
@@ -205,6 +208,7 @@ const K& PriorityQueue<K,V>::maxKey() const {
     return (*sortedSetVK.rbegin())->key;
 }
 
+/* COMPLEXITY - O(log(size(this))) */
 template<typename K, typename V>
 void PriorityQueue<K,V>::deleteMin() {
     if (sortedSetVK.empty())
@@ -215,6 +219,7 @@ void PriorityQueue<K,V>::deleteMin() {
     sortedSetKV.erase(itKV);
 }
 
+/* COMPLEXITY - O(log(size(this))) */
 template<typename K, typename V>
 void PriorityQueue<K,V>::deleteMax() {
     if (sortedSetVK.empty())
@@ -226,25 +231,26 @@ void PriorityQueue<K,V>::deleteMax() {
     sortedSetKV.erase(itKV);
 }
 
+/* COMPLEXITY - O(log(size(this))) */
 template<typename K, typename V>
 void PriorityQueue<K,V>::deleteKey(const K& k) {
     static V dummyV;
-    static K dummyK;
-    static std::shared_ptr<pairKV> ptr =
-        std::make_shared<pairKV>(dummyK, dummyV);
+    std::shared_ptr<pairKV> ptr =
+        std::make_shared<pairKV>(k, dummyV);
 
-    ptr->key = k;
     auto it = sortedSetKV.lower_bound(ptr);
-    if (it == sortedSetKV.end() || (*it)->key != k) {
+    if (it == sortedSetKV.end() ||
+        (*it)->key != k ||
+        (it != sortedSetKV.begin() && (*(it--))->key != k)) {
         throw PriorityQueueNotFoundException();
     }
-    // we've found our element with key = k
-    // let's make sure we delete only 1 element ...
     auto itVK = sortedSetVK.find(*it);
+
     sortedSetVK.erase(itVK);
     sortedSetKV.erase(it);
 }
 
+/* COMPLEXITY - O(log(size(this))) */
 template<typename K, typename V>
 void PriorityQueue<K,V>::changeValue(const K& key, const V& value) {
     deleteKey(key);
