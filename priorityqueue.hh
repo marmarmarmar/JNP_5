@@ -9,7 +9,6 @@ template<typename K, typename V>
 class PriorityQueue{
 
     public:
-        static long long inserted;                              // !!!
 
         typedef size_t size_type;
         typedef K key_type;
@@ -36,23 +35,20 @@ class PriorityQueue{
 
     private:
         void deleteKey(const K& k);
-        typedef struct triple{
+        typedef struct pairKV{
             K key;
             V val;
-            long long counter;
 
-            triple(const triple& trip){
-                key(trip.key);
-                val(trip.val);
-                counter = trip.counter; //inserted??
+            pairKV(const pairKV& pKV){
+                key(pKV.key);
+                val(pKV.val);
             }
 
-            triple(const K& k, const V& v, long long count) : key(k) , val(v), counter(count){
+            pairKV(const K& k, const V& v) : key(k) , val(v){
             }
+        } pairKV;
 
-        } triple;
-
-        struct compareVKC{
+        struct compareVK{
             bool operator() (const std::shared_ptr<triple>& lhs,
             const std::shared_ptr<triple>& rhs) const{
                 if(lhs->val < rhs->val)
@@ -63,11 +59,11 @@ class PriorityQueue{
                     return true;
                 else if(lhs->key > rhs->key)
                     return false;
-                return lhs->counter < rhs->counter;
+
             }
         };
 
-        struct compareKVC{
+        struct compareKV{
             bool operator() (const std::shared_ptr<triple>& lhs,
             const std::shared_ptr<triple>& rhs) const{
                 if(lhs->key < rhs->key)
@@ -78,11 +74,10 @@ class PriorityQueue{
                     return true;
                 else if(lhs->val > rhs->val)
                     return false;
-                return lhs->counter < rhs->counter;
             }
         };
-        std::set<std::shared_ptr<triple>, compareVKC> sortedSetVKC;
-        std::set<std::shared_ptr<triple>, compareKC> sortedSetKVC;
+        std::set<std::shared_ptr<pairKV>, compareVK> sortedSetVK;
+        std::set<std::shared_ptr<pairKV>, compareKV> sortedSetKV;
 
 
 };
@@ -100,17 +95,15 @@ PriorityQueue<K,V>::PriorityQueue(){
 /* copy constructor of map and set has strong exception guarantee */
 template<typename K, typename V>
 PriorityQueue<K,V>::PriorityQueue(const PriorityQueue<K, V>& queue) :
-sortedSetVKC(queue.sortedSetVKC), sortedSetKC(queue.sortedSetKC){
-    inserted = queue.inserted;
+sortedSetVK(queue.sortedSetVK), sortedSetKV(queue.sortedSetKV){
 }
 
 /* move constructor - just swap our empty multisets for the passed queue's
  * multiset ... */
 template<typename K, typename V>
 PriorityQueue<K,V>::PriorityQueue(PriorityQueue<K, V>&& queue){
-    queue.sortedSetVKC.swap(sortedSetVKC);
-    queue.sortedSetKC.swap(sortedSetKC);
-    inserted = queue.inserted;
+    queue.sortedSetVK.swap(sortedSetVK);
+    queue.sortedSetKV.swap(sortedSetKV);
 }
 
 /* move assignment operator=(mainly for temporary objects being passed as a
@@ -119,9 +112,9 @@ PriorityQueue<K,V>::PriorityQueue(PriorityQueue<K, V>&& queue){
     willl not call the destructor ... */
 /* 2!) operator= provides basic exception guarantee */
 template<typename K, typename V>
-PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &&queue) {
+PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &&queue){
     if(this != &queue) {
-        PriorityQueue<K, V> new_one(queue);
+        PriorityQueue<K,V> new_one(queue);
         this->swap(new_one);
     }
     return *this;
@@ -141,19 +134,18 @@ PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &queue){
 
 template<typename K, typename V>
 bool PriorityQueue<K,V>::empty() const{
-    return sortedSetVKC.empty();
+    return sortedSetVK.empty();
 }
 
 /* 1!) typename keyword added */
 template<typename K, typename V>
 typename PriorityQueue<K,V>::size_type PriorityQueue<K,V>::size() const{
-    return sortedSetVKC.size();
+    return sortedSetVK.size();
 }
 
 template<typename K, typename V>
 void PriorityQueue<K,V>::insert(const K& key, const V& value){
-    auto ptr = std::make_shared<triple>(key, value, inserted);
-    inserted++;
+    auto ptr = std::make_shared<pairKV>(key, value);
     sortedSetVKC.insert(ptr);
     sortedSetKC.insert(ptr);
 }
@@ -163,12 +155,12 @@ const V& PriorityQueue<K,V>::minValue() const{
     if(sortedSetVKC.empty()){
         ;//throw wyjatek
     }
-    return (*sortedSetVKC.begin())->val;
+    return (*sortedSetVK.begin())->val;
 }
 
 template<typename K, typename V>
 const V& PriorityQueue<K,V>::maxValue() const{
-    if(sortedSetVKC.empty()){
+    if(sortedSetVK.empty()){
         ;//throw wyjatek
     }
     return (*sortedSetVKC.rbegin())->val;
@@ -177,64 +169,62 @@ const V& PriorityQueue<K,V>::maxValue() const{
 
 template<typename K, typename V>
 const K& PriorityQueue<K,V>::minKey() const{
-    if(sortedSetVKC.empty()){
+    if(sortedSetVK.empty()){
         ;//throw wyjatek
     }
-
-    return (*sortedSetVKC.begin())->key;
+    return (*sortedSetVK.begin())->key;
 }
 
 template<typename K, typename V>
 const K& PriorityQueue<K,V>::maxKey() const{
-    if(sortedSetVKC.empty()){
+    if(sortedSetVK.empty()){
         ;//throw wyjatek
     }
-    return (*sortedSetVKC.rbegin())->key;
+    return (*sortedSetVK.rbegin())->key;
 }
 
 template<typename K, typename V>
 void PriorityQueue<K,V>::deleteMin(){
-    std::cout << "before deleteMin: "<<sortedSetVKC.size() << std::endl;
-    if(sortedSetVKC.empty())
+    std::cout << "before deleteMin: "<<sortedSetVK.size() << std::endl;
+    if(sortedSetVK.empty())
         return;
-    auto itVKC = sortedSetVKC.begin();
-    auto itKC = sortedSetKC.find(*itVKC);
-    sortedSetVKC.erase(itVKC);
-    sortedSetKC.erase(itKC);
-    std::cout << "after deleteMin: "<<sortedSetVKC.size() << std::endl;
+    auto itVK = sortedSetVK.begin();
+    auto itKV = sortedSetKV.find(*itVK);
+    sortedSetVK.erase(itVK);
+    sortedSetKV.erase(itKV);
+    std::cout << "after deleteMin: "<<sortedSetVK.size() << std::endl;
 }
 
 template<typename K, typename V>
 void PriorityQueue<K,V>::deleteMax(){
-    std::cout << "before deleteMax: "<<sortedSetVKC.size() << std::endl;
-    if(sortedSetVKC.empty())
+    std::cout << "before deleteMax: "<<sortedSetVK.size() << std::endl;
+    if(sortedSetVK.empty())
         return;
-    auto itVKC = sortedSetVKC.end();
-    --itVKC;
-    auto itKC = sortedSetKC.find(*itVKC);
-    sortedSetVKC.erase(itVKC);
-    sortedSetKC.erase(itKC);
-    std::cout << "after deleteMax: "<<sortedSetVKC.size() << std::endl;
+    auto itVK = sortedSetVK.end();
+    --itVK;
+    auto itKV = sortedSetKV.find(*itVK);
+    sortedSetVK.erase(itVK);
+    sortedSetKV.erase(itKV);
+    std::cout << "after deleteMax: "<<sortedSetVK.size() << std::endl;
 }
 
 template<typename K, typename V>
 void PriorityQueue<K,V>::deleteKey(const K& k){
     static V dummyV;
-    static long long dummyCount = 0;
     static K dummyK;
-    static std::shared_ptr<triple> ptr =
-        std::make_shared<triple>(dummyK, dummyV, dummyCount);
+    static std::shared_ptr<pairKV> ptr =
+        std::make_shared<pairKV>(dummyK, dummyV);
 
     ptr->key = k;
-    auto it = sortedSetKC.lower_bound(ptr);
-    if(it == sortedSetKC.end() || (*it)->key != k){
+    auto it = sortedSetKV.lower_bound(ptr);
+    if(it == sortedSetKV.end() || (*it)->key != k){
         //throw wyjatek
     }
     // we've found our element with key = k
     // let's make sure we delete only 1 element ...
-    auto itVKC = sortedSetVKC.find(*it);
-    sortedSetVKC.erase(itVKC);
-    sortedSetKC.erase(it);
+    auto itVK = sortedSetVK.find(*it);
+    sortedSetVK.erase(itVK);
+    sortedSetKV.erase(it);
 }
 
 template<typename K, typename V>
@@ -248,29 +238,26 @@ template<typename K, typename V>
 void PriorityQueue<K,V>::merge(PriorityQueue<K, V>& queue){
     if(queue.empty())
         return;
-    auto it_K_curr = queue.sortedSetKC.begin();
-    auto it_K_next = ++it_K_curr;
+    auto it_KV_curr = queue.sortedSetKV.begin();
+    auto it_KV_next = ++it_KV_curr;
     while(queue.size() > 0){
-        auto it_VKC = queue.sortedSetVKC.find(*it_K_curr);
+        auto it_VK = queue.sortedSetVK.find(*it_KV_curr);
 
-        auto copy_curr_ptr(*it_K_curr);
-        queue.sortedSetKC.erase(it_K_curr);
-        queue.sortedSetVKC.erase(it_VKC);
-        sortedSetVKC.insert(copy_curr_ptr);
-        sortedSetKC.insert(copy_curr_ptr);
-        it_K_curr = it_K_next;
-        ++it_K_next;
+        auto copy_curr_ptr(*it_KV_curr);
+        queue.sortedSetKC.erase(it_KV_curr);
+        queue.sortedSetVKC.erase(it_VK);
+        sortedSetVK.insert(copy_curr_ptr);
+        sortedSetKV.insert(copy_curr_ptr);
+        it_KV_curr = it_KV_next;
+        ++it_KV_next;
     }
 }
 
 template<typename K, typename V>
 void PriorityQueue<K,V>::swap(PriorityQueue<K, V>& queue){
     if(this != &queue){
-        queue.sortedSetVKC.swap(sortedSetVKC);
-        queue.sortedSetKC.swap(sortedSetKC);
-        long long tmp = inserted;
-        inserted = queue.inserted;
-        queue.inserted = tmp;
+        queue.sortedSetVK.swap(sortedSetVK);
+        queue.sortedSetKV.swap(sortedSetKV);
     }
 }
 

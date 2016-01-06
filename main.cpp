@@ -5,11 +5,6 @@
 
 #include "priorityqueue.hh"
 
-template<>
-long long PriorityQueue<int,double>::inserted = 0;
-
-template<>
-long long PriorityQueue<int,int>::inserted = 0;
 
 PriorityQueue<int, int> f(PriorityQueue<int, int> q)
 {
