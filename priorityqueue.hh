@@ -9,6 +9,8 @@ template<typename K, typename V>
 class PriorityQueue{
 
     public:
+        static long long inserted;                              // !!!
+
         typedef size_t size_type;
         typedef K key_type;
         typedef V value_type;
@@ -25,13 +27,15 @@ class PriorityQueue{
         const K& maxKey() const;
         void deleteMin();
         void deleteMax();
+        void changeValue(const K& key, const V& value);
+        void merge(PriorityQueue<K, V>& queue);
 
         bool empty() const;
         size_type size() const;
         void insert(const K& key, const V& value);
 
     private:
-        static long long inserted;
+        void deleteKey(const K& k);
         typedef struct triple{
             K key;
             V val;
@@ -76,6 +80,53 @@ class PriorityQueue{
 
 /******************** Constructors ********************/
 
+/* default constructor */
+template<typename K, typename V>
+PriorityQueue<K,V>::PriorityQueue(){
+}
+
+/* copy constructor of map and set has strong exception guarantee */
+template<typename K, typename V>
+PriorityQueue<K,V>::PriorityQueue(const PriorityQueue<K, V>& queue) :
+sortedSetVKC(queue.sortedSetVKC), sortedSetKC(queue.sortedSetKC){
+    inserted = queue.inserted;
+}
+
+/* move constructor - just swap our empty multisets for the passed queue's
+ * multiset ... */
+template<typename K, typename V>
+PriorityQueue<K,V>::PriorityQueue(PriorityQueue<K, V>&& queue){
+    queue.sortedSetVKC.swap(sortedSetVKC);
+    queue.sortedSetKC.swap(sortedSetKC);
+    inserted = queue.inserted;
+}
+
+/* move assignment operator=(mainly for temporary objects being passed as a
+ * parameter) */
+/* 1!) What happens to queue.sortedSetVK after calling std::move on it? I hope it
+    willl not call the destructor ... */
+/* 2!) operator= provides basic exception guarantee */
+template<typename K, typename V>
+PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &&queue) {
+    if(this != &queue) {
+        PriorityQueue<K, V> new_one(queue);
+        this->swap(new_one);
+    }
+    return *this;
+}
+
+/* assignment operator= for lvalues ... we just copy the multisets ... */
+/*  1!) What happens to the sortedSetVK if it had some elements(possibly allocated with new)?
+ *  2!) operator= provides basic exception guarantee */
+template<typename K, typename V>
+PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &queue){
+    if(this != &queue){
+        PriorityQueue<K, V> new_one(queue);
+        this->swap(new_one);
+    }
+    return *this;
+}
+
 template<typename K, typename V>
 bool PriorityQueue<K,V>::empty() const{
     return sortedSetVKC.empty();
@@ -85,19 +136,6 @@ bool PriorityQueue<K,V>::empty() const{
 template<typename K, typename V>
 typename PriorityQueue<K,V>::size_type PriorityQueue<K,V>::size() const{
     return sortedSetVKC.size();
-}
-
-/* default constructor */
-template<typename K, typename V>
-PriorityQueue<K,V>::PriorityQueue(){
-}
-
-/* move constructor - just swap our empty multisets for the passed queue's
- * multiset ... */
-template<typename K, typename V>
-PriorityQueue<K,V>::PriorityQueue(PriorityQueue<K, V>&& queue){
-    queue.sortedSetVKC.swap(sortedSetVKC);
-    queue.sortedSetKC.swap(sortedSetKC);
 }
 
 template<typename K, typename V>
@@ -123,6 +161,7 @@ const V& PriorityQueue<K,V>::maxValue() const{
     }
     return (*sortedSetVKC.rbegin())->val;
 }
+
 
 template<typename K, typename V>
 const K& PriorityQueue<K,V>::minKey() const{
@@ -157,55 +196,48 @@ void PriorityQueue<K,V>::deleteMax(){
         return;
     auto itVKC = sortedSetVKC.rbegin();
     auto itKC = sortedSetKC.find(*itVKC);
-    sortedSetVKC.erase(itVKC);
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!sortedSetVKC.erase(itVKC);
     sortedSetKC.erase(itKC);
 }
 
-
-/* copy constructor of map and set has strong exception guarantee */
 template<typename K, typename V>
-PriorityQueue<K,V>::PriorityQueue(const PriorityQueue<K, V>& queue){
-    for(auto it = queue.sortedSetVKC.begin(); it != queue.sortedSetVKC.end(); ++it){
-        auto ptr = std::make_shared<triple>(*it);
+void PriorityQueue<K,V>::deleteKey(const K& k){
+    static V dummyV;
+    static long long dummyCount = 0;
+    static K dummyK;
+    static std::shared_ptr<triple> ptr =
+        std::make_shared<triple>(dummyK, dummyV, dummyCount);
 
+    ptr->key = k;
+    auto it = sortedSetKC.lower_bound(ptr);
+    if(it == sortedSetKC.end() || (*it)->key != k){
+        //throw wyjatek
     }
+    // we've found our element with key = k
+    // let's make sure we delete only 1 element ...
+    auto itVKC = sortedSetVKC.find(*it);
+    sortedSetVKC.erase(itVKC);
+    sortedSetKC.erase(it);
 }
 
-
-
-
-
-
-
-
-/* move assignment operator=(mainly for temporary objects being passed as a
- * parameter) */
-/* 1!) What happens to queue.sortedSetVK after calling std::move on it? I hope it
-    willl not call the destructor ... */
-/* 2!) operator= provides basic exception guarantee */
 template<typename K, typename V>
-PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &&queue) {
-    if(this != &queue) {
-        PriorityQueue <K, V> new_one(queue);
-        this->swap(new_one);
-    }
-    return *this;
+void PriorityQueue<K,V>::changeValue(const K& key, const V& value){
+    deleteKey(key);
+    insert(key, value);
 }
 
+/*
+template<typename K, typename V>
+void merge(PriorityQueue<K, V>& queue){
+
+}
+*/
 
 
 
-/* assignment operator= for lvalues ... we just copy the multisets ... */
-/*  1!) What happens to the sortedSetVK if it had some elements(possibly allocated with new)?
- *  2!) operator= provides basic exception guarantee */
-/*template<typename K, typename V>
-PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &queue){
-    if(this != &queue){
-        sortedSetVK = queue.sortedSetVK;
-        sortedSetK = queue.sortedSetK;
-    }
-    return *this;
-}*/
+
+
+
 
 
 
@@ -217,6 +249,9 @@ void PriorityQueue<K,V>::swap(PriorityQueue<K, V>& queue){
     if(this != &queue){
         queue.sortedSetVKC.swap(sortedSetVKC);
         queue.sortedSetKC.swap(sortedSetKC);
+        long long tmp = inserted;
+        inserted = queue.inserted;
+        queue.inserted = tmp;
     }
 }
 

@@ -1,22 +1,61 @@
+
 #include <iostream>
+#include <exception>
+#include <cassert>
+
 #include "priorityqueue.hh"
 
-using namespace std;
-int main()
-{
-    PriorityQueue<int,double> pqueue1;
-    pqueue1.insert(1,2.0);
-    PriorityQueue<int,double> pqueue2(pqueue1);
-    pqueue1.insert(2,2.2);
-    auto ptr = std::make_shared<std::pair<int,double>>(1,2.0);
-    std::shared_ptr<std::pair<int,double>> * pt = &ptr;
-    //pt = ptr;
+template<>
+long long PriorityQueue<int,double>::inserted = 0;
 
-    cout << ptr << " " << *pt << endl;
-    std::cout << pqueue1.size() << std::endl;
-    std::cout << pqueue2.size() << std::endl;
-    /*std::cout << "Created a shared Derived (as a pointer to Base)\n"
-              << "  p.get() = " << p.get()
-              << ", p.use_count() = " << p.use_count() << '\n';*/
+template<>
+long long PriorityQueue<int,int>::inserted = 0;
+
+PriorityQueue<int, int> f(PriorityQueue<int, int> q)
+{
+    return q;
 }
 
+int main() {
+    PriorityQueue<int, int> P = f(PriorityQueue<int, int>());
+    assert(P.empty());
+
+    P.insert(1, 42);
+    P.insert(2, 13);
+    P.insert(3, 13);
+    P.insert(4, 13);
+
+    std::cout << P.size() << std::endl;
+    assert(P.size() == 2);
+    assert(P.maxKey() == 1);
+    assert(P.maxValue() == 42);
+    assert(P.minKey() == 2);
+    assert(P.minValue() == 13);
+
+    PriorityQueue<int, int> Q(f(P));
+
+    Q.deleteMax();
+    Q.deleteMin();
+    Q.deleteMin();
+
+    assert(Q.empty());
+
+    PriorityQueue<int, int> R(Q);
+
+    R.insert(1, 100);
+    R.insert(2, 100);
+    R.insert(3, 300);
+
+    PriorityQueue<int, int> S;
+    S = R;
+
+
+        S.changeValue(4, 400);
+
+
+    S.changeValue(2, 200);
+
+
+
+    return 0;
+}
