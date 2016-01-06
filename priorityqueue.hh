@@ -239,9 +239,9 @@ void PriorityQueue<K,V>::deleteKey(const K& k) {
         std::make_shared<pairKV>(k, dummyV);
 
     auto it = sortedSetKV.lower_bound(ptr);
-    if (it == sortedSetKV.end() ||
-        (*it)->key != k ||
-        (it != sortedSetKV.begin() && (*(it--))->key != k)) {
+    if (this->empty() ||
+        !((it != sortedSetKV.end() && (*it)->key == k) ||
+        (it != sortedSetKV.begin() && (*(--it))->key == k))) {
         throw PriorityQueueNotFoundException();
     }
     auto itVK = sortedSetVK.find(*it);
@@ -255,11 +255,6 @@ template<typename K, typename V>
 void PriorityQueue<K,V>::changeValue(const K& key, const V& value) {
     deleteKey(key);
     insert(key, value);
-}
-
-template<typename K, typename V>
-void printQueue(const PriorityQueue<K,V>& p1, const PriorityQueue<K,V>& p2) {
-
 }
 
 template<typename K, typename V>
