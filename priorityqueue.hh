@@ -66,7 +66,7 @@ class PriorityQueue {
 
         struct compareVK {
             bool operator() (const std::shared_ptr<pairKV>& lhs,
-            const std::shared_ptr<pairKV>& rhs) const {
+            const std::shared_ptr<pairKV>& rhs) const noexcept {
                 if (lhs->val < rhs->val)
                     return true;
                 else if (lhs->val > rhs->val)
@@ -82,7 +82,7 @@ class PriorityQueue {
 
         struct compareKV {
             bool operator() (const std::shared_ptr<pairKV>& lhs,
-            const std::shared_ptr<pairKV>& rhs) const {
+            const std::shared_ptr<pairKV>& rhs) const noexcept {
                 if (lhs->key < rhs->key)
                     return true;
                 else if (lhs->key > rhs->key)
@@ -124,15 +124,10 @@ PriorityQueue<K,V>::PriorityQueue(PriorityQueue<K, V>&& queue) {
 
 /* move assignment operator=(mainly for temporary objects being passed as a
  * parameter) */
-/* 1!) What happens to queue.sortedSetVK after calling std::move on it? I hope it
-    willl not call the destructor ... */
-/* 2!) operator= provides basic exception guarantee */
+/* COMPLEXITY : O(1) : obvious - swap. */
 template<typename K, typename V>
 PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &&queue) {
     if (this != &queue) {
-        //this->PriorityQueue<K, V>(queue);
-        //PriorityQueue<K,V> new_one(queue);
-        //this->swap(new_one);
         queue.sortedSetVK.swap(sortedSetVK);
         queue.sortedSetKV.swap(sortedSetKV);
     }
@@ -140,10 +135,10 @@ PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &&queue) 
 }
 
 /* assignment operator= for lvalues ... we just copy the multisets ... */
-/*  1!) What happens to the sortedSetVK if it had some elements(possibly allocated with new)?
- *  2!) operator= provides basic exception guarantee */
+/* COMPLEXITY : O(size(queue)) : from stl::set) */
 template<typename K, typename V>
 PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &queue) {
+
     if (this != &queue) {
         PriorityQueue<K, V> new_one(queue);
         this->swap(new_one);
@@ -151,22 +146,30 @@ PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &queue) {
     return *this;
 }
 
+/* COMPLEXITY : O(1) : from stl::set */
 template<typename K, typename V>
 bool PriorityQueue<K,V>::empty() const {
     return sortedSetVK.empty();
 }
 
 /* 1!) typename keyword added */
+/* COMPLEXITY : O(1) : from stl::set */
 template<typename K, typename V>
 typename PriorityQueue<K,V>::size_type PriorityQueue<K,V>::size() const {
     return sortedSetVK.size();
 }
 
+/* COMPLEXIT : O(log(size(this))) : */
 template<typename K, typename V>
 void PriorityQueue<K,V>::insert(const K& key, const V& value) {
     auto ptr = std::make_shared<pairKV>(key, value);
-    sortedSetVK.insert(ptr);
-    sortedSetKV.insert(ptr);
+    auto helper_iterator = sortedSetVK.insert(ptr);
+    try {
+      sortedSetKV.insert(ptr);
+    } catch (...) {
+      sortedSetVK.erase(helper_iterator);
+      throw;
+    }
 }
 
 template<typename K, typename V>
