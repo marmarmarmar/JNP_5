@@ -43,7 +43,7 @@ class PriorityQueue {
         void deleteMax();
         void changeValue(const K& key, const V& value);
         void merge(PriorityQueue<K, V>& queue);
-        bool operator<(const PriorityQueue<K,V>& other) const;
+        bool operator<(const PriorityQueue<K, V>& other) const;
 
         bool empty() const;
         size_type size() const;
@@ -104,19 +104,19 @@ class PriorityQueue {
 
 /* default constructor */
 template<typename K, typename V>
-PriorityQueue<K,V>::PriorityQueue() {
+PriorityQueue<K, V>::PriorityQueue() {
 }
 
 /* copy constructor of map and set has strong exception guarantee */
 template<typename K, typename V>
-PriorityQueue<K,V>::PriorityQueue(const PriorityQueue<K, V>& queue) :
+PriorityQueue<K, V>::PriorityQueue(const PriorityQueue<K, V>& queue) :
 sortedSetVK(queue.sortedSetVK), sortedSetKV(queue.sortedSetKV) {
 }
 
 /* move constructor - just swap our empty multisets for the passed queue's
  * multiset ... */
 template<typename K, typename V>
-PriorityQueue<K,V>::PriorityQueue(PriorityQueue<K, V>&& queue) {
+PriorityQueue<K, V>::PriorityQueue(PriorityQueue<K, V>&& queue) {
     queue.sortedSetVK.swap(sortedSetVK);
     queue.sortedSetKV.swap(sortedSetKV);
 
@@ -126,7 +126,7 @@ PriorityQueue<K,V>::PriorityQueue(PriorityQueue<K, V>&& queue) {
  * parameter) */
 /* COMPLEXITY : O(1) : obvious - swap. */
 template<typename K, typename V>
-PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &&queue) {
+PriorityQueue<K, V>& PriorityQueue<K, V>::operator=(PriorityQueue<K, V> &&queue) {
     if (this != &queue) {
         queue.sortedSetVK.swap(sortedSetVK);
         queue.sortedSetKV.swap(sortedSetKV);
@@ -137,7 +137,7 @@ PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &&queue) 
 /* assignment operator= for lvalues ... we just copy the multisets ... */
 /* COMPLEXITY : O(size(queue)) : from stl::set) */
 template<typename K, typename V>
-PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &queue) {
+PriorityQueue<K, V>& PriorityQueue<K, V>::operator=(PriorityQueue<K, V> &queue) {
 
     if (this != &queue) {
         PriorityQueue<K, V> new_one(queue);
@@ -148,20 +148,20 @@ PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &queue) {
 
 /* COMPLEXITY : O(1) : from stl::set */
 template<typename K, typename V>
-bool PriorityQueue<K,V>::empty() const {
+bool PriorityQueue<K, V>::empty() const {
     return sortedSetVK.empty();
 }
 
 /* 1!) typename keyword added */
 /* COMPLEXITY : O(1) : from stl::set */
 template<typename K, typename V>
-typename PriorityQueue<K,V>::size_type PriorityQueue<K,V>::size() const {
+typename PriorityQueue<K, V>::size_type PriorityQueue<K, V>::size() const {
     return sortedSetVK.size();
 }
 
 /* COMPLEXITY : O(log(size(this))) : */
 template<typename K, typename V>
-void PriorityQueue<K,V>::insert(const K& key, const V& value) {
+void PriorityQueue<K, V>::insert(const K& key, const V& value) {
     auto ptr = std::make_shared<pairKV>(key, value);
     auto helper_iterator = sortedSetVK.insert(ptr);
     try {
@@ -174,7 +174,7 @@ void PriorityQueue<K,V>::insert(const K& key, const V& value) {
 
 /* COMPLEXITY - O(1) */
 template<typename K, typename V>
-const V& PriorityQueue<K,V>::minValue() const {
+const V& PriorityQueue<K, V>::minValue() const {
     if (sortedSetVK.empty()) {
         throw PriorityQueueEmptyException();
     }
@@ -183,7 +183,7 @@ const V& PriorityQueue<K,V>::minValue() const {
 
 /* COMPLEXITY - O(1) */
 template<typename K, typename V>
-const V& PriorityQueue<K,V>::maxValue() const {
+const V& PriorityQueue<K, V>::maxValue() const {
     if (sortedSetVK.empty()) {
         throw PriorityQueueEmptyException();
     }
@@ -192,7 +192,7 @@ const V& PriorityQueue<K,V>::maxValue() const {
 
 /* COMPLEXITY - O(1) */
 template<typename K, typename V>
-const K& PriorityQueue<K,V>::minKey() const {
+const K& PriorityQueue<K, V>::minKey() const {
     if (sortedSetVK.empty()) {
         throw PriorityQueueEmptyException();
     }
@@ -201,7 +201,7 @@ const K& PriorityQueue<K,V>::minKey() const {
 
 /* COMPLEXITY - O(1) */
 template<typename K, typename V>
-const K& PriorityQueue<K,V>::maxKey() const {
+const K& PriorityQueue<K, V>::maxKey() const {
     if (sortedSetVK.empty()) {
         throw PriorityQueueEmptyException();
     }
@@ -210,7 +210,7 @@ const K& PriorityQueue<K,V>::maxKey() const {
 
 /* COMPLEXITY - O(log(size(this))) */
 template<typename K, typename V>
-void PriorityQueue<K,V>::deleteMin() {
+void PriorityQueue<K, V>::deleteMin() {
     if (sortedSetVK.empty())
         return;
     auto itVK = sortedSetVK.begin();
@@ -221,7 +221,7 @@ void PriorityQueue<K,V>::deleteMin() {
 
 /* COMPLEXITY - O(log(size(this))) */
 template<typename K, typename V>
-void PriorityQueue<K,V>::deleteMax() {
+void PriorityQueue<K, V>::deleteMax() {
     if (sortedSetVK.empty())
         return;
     auto itVK = sortedSetVK.end();
@@ -233,7 +233,7 @@ void PriorityQueue<K,V>::deleteMax() {
 
 /* COMPLEXITY - O(log(size(this))) */
 template<typename K, typename V>
-void PriorityQueue<K,V>::changeValue(const K& key, const V& value) {
+void PriorityQueue<K, V>::changeValue(const K& key, const V& value) {
     std::shared_ptr<pairKV> ptr =
         std::make_shared<pairKV>(key, value);
 
@@ -247,44 +247,52 @@ void PriorityQueue<K,V>::changeValue(const K& key, const V& value) {
 
 }
 
+// COMPLEXITY = O(size() + queue.size() * log(size() + queue.size())) 
 template<typename K, typename V>
-void PriorityQueue<K,V>::merge(PriorityQueue<K, V>& queue) {
+void PriorityQueue<K, V>::merge(PriorityQueue<K, V>& queue) {
     if (queue.empty())
         return;
 
-    PriorityQueue<K, V> new_one(*this);
+    if (this != &queue) {
+      PriorityQueue<K, V> new_one(*this);
 
-    for (auto iterator = queue.sortedSetVK.begin();
-        iterator != queue.sortedSetVK.end();
-        ++iterator) {
+      for (auto iterator = queue.sortedSetVK.begin();
+          iterator != queue.sortedSetVK.end();
+          ++iterator) {
 
-      new_one.sortedSetVK.insert(*iterator);
-      new_one.sortedSetKV.insert(*iterator);
+        new_one.sortedSetVK.insert(*iterator);
+        new_one.sortedSetKV.insert(*iterator);
+      }
 
+      queue = PriorityQueue<K, V>();
+      this->swap(new_one); 
     }
-
-    queue = PriorityQueue<K, V>();
-    this->swap(new_one); 
 }
 
+// COMPLEXITY = O(1) 
 template<typename K, typename V>
-void PriorityQueue<K,V>::swap(PriorityQueue<K, V>& queue) {
+void PriorityQueue<K, V>::swap(PriorityQueue<K, V>& queue) {
     if (this != &queue) {
         queue.sortedSetVK.swap(sortedSetVK);
         queue.sortedSetKV.swap(sortedSetKV);
     }
 }
 
+// COMPLEXITY = O(1) 
 template<typename K, typename V>
-void swap(PriorityQueue<K,V>& lp, PriorityQueue<K,V>& rp) {
+void swap(PriorityQueue<K, V>& lp, PriorityQueue<K, V>& rp) {
     lp.swap(rp);
 }
 
+// COMPLEXITY = O(size()) 
 template<typename K, typename V>
-bool PriorityQueue<K,V>::operator<(const PriorityQueue<K,V>& rhs) const {
+bool PriorityQueue<K, V>::operator<(const PriorityQueue<K, V>& rhs) const {
+
     auto it = sortedSetKV.begin();
     auto it_rhs = rhs.sortedSetKV.begin();
+
     while (it != sortedSetKV.end() && it_rhs != rhs.sortedSetKV.end()) {
+
         if ((*it)->key < (*it_rhs)->key)
             return true;
         else if ((*it)->key > (*it_rhs)->key)
@@ -305,34 +313,33 @@ bool PriorityQueue<K,V>::operator<(const PriorityQueue<K,V>& rhs) const {
 
 
 template<typename K, typename V>
-bool operator<(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs) {
+bool operator<(const PriorityQueue<K, V>& lhs, const PriorityQueue<K, V>& rhs) {
     return lhs.operator<(rhs);
 }
 
 template<typename K, typename V>
-bool operator>(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs) {
+bool operator>(const PriorityQueue<K, V>& lhs, const PriorityQueue<K, V>& rhs) {
     return rhs < lhs;
 }
 
 template<typename K, typename V>
-bool operator==(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs) {
+bool operator==(const PriorityQueue<K, V>& lhs, const PriorityQueue<K, V>& rhs) {
     return !(lhs > rhs) && !(lhs < rhs);
 }
 
 template<typename K, typename V>
-bool operator!=(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs) {
+bool operator!=(const PriorityQueue<K, V>& lhs, const PriorityQueue<K, V>& rhs) {
     return !(lhs == rhs);
 }
 
 template<typename K, typename V>
-bool operator<=(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs) {
+bool operator<=(const PriorityQueue<K, V>& lhs, const PriorityQueue<K, V>& rhs) {
     return !(lhs > rhs);
 }
 
 template<typename K, typename V>
-bool operator>=(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs) {
+bool operator>=(const PriorityQueue<K, V>& lhs, const PriorityQueue<K, V>& rhs) {
     return !(lhs < rhs);
 }
 
 #endif /* PRIORITYQUEUE_HH_ */
-
