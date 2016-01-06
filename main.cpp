@@ -42,7 +42,7 @@ std::cout << P.size() << std::endl;
 
     S.changeValue(4, 400);
 
-
+    S == R;
     S.changeValue(2, 200);
 
 

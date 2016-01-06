@@ -28,6 +28,7 @@ class PriorityQueue{
         void deleteMax();
         void changeValue(const K& key, const V& value);
         void merge(PriorityQueue<K, V>& queue);
+        bool operator<(const PriorityQueue<K,V>& other) const;
 
         bool empty() const;
         size_type size() const;
@@ -78,8 +79,8 @@ class PriorityQueue{
                 return true;        //whatever
             }
         };
-        std::set<std::shared_ptr<pairKV>, compareVK> sortedSetVK;
-        std::set<std::shared_ptr<pairKV>, compareKV> sortedSetKV;
+        std::multiset<std::shared_ptr<pairKV>, compareVK> sortedSetVK;
+        std::multiset<std::shared_ptr<pairKV>, compareKV> sortedSetKV;
 
 
 };
@@ -269,10 +270,10 @@ void swap(PriorityQueue<K,V>& lp, PriorityQueue<K,V>& rp){
 }
 
 template<typename K, typename V>
-bool operator<(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs){
-    auto it_lhs = lhs.sortedSetKV.begin();
+bool PriorityQueue<K,V>::operator<(const PriorityQueue<K,V>& rhs) const{
+    auto it_lhs = sortedSetKV.begin();
     auto it_rhs = rhs.sortedSetKV.begin();
-    while(it_lhs != lhs.sortedSetKV.end() && it_rhs != rhs.sortedSetKV.end()){
+    while(it_lhs != sortedSetKV.end() && it_rhs != rhs.sortedSetKV.end()){
         if((*it_lhs)->key < (*it_rhs)->key)
             return true;
         else if((*it_lhs)->key > (*it_rhs)->key)
@@ -286,9 +287,15 @@ bool operator<(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs){
         ++it_lhs;
         ++it_rhs;
     }
-    if(it_lhs == lhs.sortedSetKV.end() && it_rhs != rhs.sortedSetKV.end())
+    if(it_lhs == sortedSetKV.end() && it_rhs != rhs.sortedSetKV.end())
         return true;
     return false;
+}
+
+
+template<typename K, typename V>
+bool operator<(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs){
+    return lhs.operator<(rhs);
 }
 
 template<typename K, typename V>
