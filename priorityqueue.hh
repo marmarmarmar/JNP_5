@@ -55,18 +55,26 @@ class PriorityQueue{
         struct compareVKC{
             bool operator() (const std::shared_ptr<triple>& lhs,
             const std::shared_ptr<triple>& rhs) const{
-                return lhs->val < rhs->val ?
-                    (lhs->key < rhs->key ?
-                        lhs->counter < rhs->counter: false)
-                    : false;
+                if(lhs->val < rhs->val)
+                    return true;
+                else if(lhs->val > rhs->val)
+                    return false;
+                if(lhs->key < rhs->key)
+                    return true;
+                else if(lhs->key > rhs->key)
+                    return false;
+                return lhs->counter < rhs->counter;
             }
         };
 
         struct compareKC{
             bool operator() (const std::shared_ptr<triple>& lhs,
             const std::shared_ptr<triple>& rhs) const{
-                return lhs->key < rhs->key ?
-                    lhs->counter < rhs->counter : false;
+                if(lhs->key < rhs->key)
+                    return true;
+                else if(lhs->key > rhs->key)
+                    return false;
+                return lhs->counter < rhs->counter;
             }
         };
         std::set<std::shared_ptr<triple>, compareVKC> sortedSetVKC;
@@ -182,22 +190,27 @@ const K& PriorityQueue<K,V>::maxKey() const{
 
 template<typename K, typename V>
 void PriorityQueue<K,V>::deleteMin(){
+    std::cout << "before deleteMin: "<<sortedSetVKC.size() << std::endl;
     if(sortedSetVKC.empty())
         return;
     auto itVKC = sortedSetVKC.begin();
     auto itKC = sortedSetKC.find(*itVKC);
     sortedSetVKC.erase(itVKC);
     sortedSetKC.erase(itKC);
+    std::cout << "after deleteMin: "<<sortedSetVKC.size() << std::endl;
 }
 
 template<typename K, typename V>
 void PriorityQueue<K,V>::deleteMax(){
+    std::cout << "before deleteMax: "<<sortedSetVKC.size() << std::endl;
     if(sortedSetVKC.empty())
         return;
-    auto itVKC = sortedSetVKC.rbegin();
+    auto itVKC = sortedSetVKC.end();
+    --itVKC;
     auto itKC = sortedSetKC.find(*itVKC);
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!sortedSetVKC.erase(itVKC);
+    sortedSetVKC.erase(itVKC);
     sortedSetKC.erase(itKC);
+    std::cout << "after deleteMax: "<<sortedSetVKC.size() << std::endl;
 }
 
 template<typename K, typename V>
