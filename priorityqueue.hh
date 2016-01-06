@@ -132,7 +132,6 @@ PriorityQueue<K,V>::PriorityQueue(PriorityQueue<K, V>&& queue){
 template<typename K, typename V>
 PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &&queue){
     if(this != &queue) {
-        std::cout << " move assignment operator" << std::endl;
         //this->PriorityQueue<K, V>(queue);
         //PriorityQueue<K,V> new_one(queue);
         //this->swap(new_one);
@@ -148,7 +147,6 @@ PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &&queue){
 template<typename K, typename V>
 PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &queue){
     if(this != &queue){
-        std::cout << " copy assignment operator" << std::endl;
         PriorityQueue<K, V> new_one(queue);
         this->swap(new_one);
     }
@@ -208,29 +206,23 @@ const K& PriorityQueue<K,V>::maxKey() const{
 
 template<typename K, typename V>
 void PriorityQueue<K,V>::deleteMin(){
-    std::cout << "before deleteMin: "<<sortedSetVK.size() << std::endl;
     if(sortedSetVK.empty())
         return;
     auto itVK = sortedSetVK.begin();
     auto itKV = sortedSetKV.find(*itVK);
     sortedSetVK.erase(itVK);
     sortedSetKV.erase(itKV);
-    std::cout << "after deleteMin: "<<sortedSetVK.size() << std::endl;
 }
 
 template<typename K, typename V>
 void PriorityQueue<K,V>::deleteMax(){
-    std::cout << "before deleteMax: "<<sortedSetVK.size() << std::endl;
     if(sortedSetVK.empty())
         return;
     auto itVK = sortedSetVK.end();
     --itVK;
     auto itKV = sortedSetKV.find(*itVK);
-    std::cout << &(*itVK) << " "<<&(*itKV) << std::endl;
     sortedSetVK.erase(itVK);
-    std::cout << "before deleteMax: "<<sortedSetVK.size() << std::endl;
     sortedSetKV.erase(itKV);
-    std::cout << "after deleteMax: "<<sortedSetVK.size() << std::endl;
 }
 
 template<typename K, typename V>
@@ -268,8 +260,6 @@ void PriorityQueue<K,V>::merge(PriorityQueue<K, V>& queue){
     if(queue.empty())
         return;
     auto it_KV_curr = queue.sortedSetKV.begin();
-    //auto it_KV_next = ++it_KV_curr;
-    std::cout << "mergeeeeeeeeeeeeeeee" << std::endl;
     while(queue.size() > 0){
         it_KV_curr = queue.sortedSetKV.begin();
         auto it_VK = queue.sortedSetVK.find(*it_KV_curr);
@@ -278,9 +268,6 @@ void PriorityQueue<K,V>::merge(PriorityQueue<K, V>& queue){
         queue.sortedSetVK.erase(it_VK);
         sortedSetVK.insert(copy_curr_ptr);
         sortedSetKV.insert(copy_curr_ptr);
-        //it_KV_curr = it_KV_next;
-        //++it_KV_next;
-
     }
 }
 
