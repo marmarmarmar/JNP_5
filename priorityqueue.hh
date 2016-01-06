@@ -6,7 +6,7 @@
 #include <set>
 #include <exception>
 
-class PriorityQueueEmptyException : public exception{
+class PriorityQueueEmptyException : public std::exception{
     public:
         virtual const char* what() const throw()
         {
@@ -14,7 +14,7 @@ class PriorityQueueEmptyException : public exception{
         }
 };
 
-class PriorityQueueNotFoundException : public exception{
+class PriorityQueueNotFoundException : public std::exception{
     public:
         virtual const char* what() const throw()
         {
