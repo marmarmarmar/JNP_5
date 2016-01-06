@@ -60,7 +60,7 @@ class PriorityQueue{
                     return true;
                 else if(lhs->key > rhs->key)
                     return false;
-                return true;        //whatever
+                return false;
 
             }
         };
@@ -76,7 +76,7 @@ class PriorityQueue{
                     return true;
                 else if(lhs->val > rhs->val)
                     return false;
-                return true;        //whatever
+                return false;
             }
         };
         std::multiset<std::shared_ptr<pairKV>, compareVK> sortedSetVK;
@@ -84,9 +84,6 @@ class PriorityQueue{
 
 
 };
-
-//PriorityQueue<K,V>::inserted = 0; - initialize!!!!!!!!!!!!!!
-
 
 /******************** Constructors ********************/
 
@@ -206,7 +203,9 @@ void PriorityQueue<K,V>::deleteMax(){
     auto itVK = sortedSetVK.end();
     --itVK;
     auto itKV = sortedSetKV.find(*itVK);
+    std::cout << &(*itVK) << " "<<&(*itKV) << std::endl;
     sortedSetVK.erase(itVK);
+    std::cout << "before deleteMax: "<<sortedSetVK.size() << std::endl;
     sortedSetKV.erase(itKV);
     std::cout << "after deleteMax: "<<sortedSetVK.size() << std::endl;
 }
