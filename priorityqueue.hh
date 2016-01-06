@@ -49,8 +49,8 @@ class PriorityQueue{
         } pairKV;
 
         struct compareVK{
-            bool operator() (const std::shared_ptr<triple>& lhs,
-            const std::shared_ptr<triple>& rhs) const{
+            bool operator() (const std::shared_ptr<pairKV>& lhs,
+            const std::shared_ptr<pairKV>& rhs) const{
                 if(lhs->val < rhs->val)
                     return true;
                 else if(lhs->val > rhs->val)
@@ -59,13 +59,14 @@ class PriorityQueue{
                     return true;
                 else if(lhs->key > rhs->key)
                     return false;
+                return true;        //whatever
 
             }
         };
 
         struct compareKV{
-            bool operator() (const std::shared_ptr<triple>& lhs,
-            const std::shared_ptr<triple>& rhs) const{
+            bool operator() (const std::shared_ptr<pairKV>& lhs,
+            const std::shared_ptr<pairKV>& rhs) const{
                 if(lhs->key < rhs->key)
                     return true;
                 else if(lhs->key > rhs->key)
@@ -74,6 +75,7 @@ class PriorityQueue{
                     return true;
                 else if(lhs->val > rhs->val)
                     return false;
+                return true;        //whatever
             }
         };
         std::set<std::shared_ptr<pairKV>, compareVK> sortedSetVK;
@@ -146,13 +148,13 @@ typename PriorityQueue<K,V>::size_type PriorityQueue<K,V>::size() const{
 template<typename K, typename V>
 void PriorityQueue<K,V>::insert(const K& key, const V& value){
     auto ptr = std::make_shared<pairKV>(key, value);
-    sortedSetVKC.insert(ptr);
-    sortedSetKC.insert(ptr);
+    sortedSetVK.insert(ptr);
+    sortedSetKV.insert(ptr);
 }
 
 template<typename K, typename V>
 const V& PriorityQueue<K,V>::minValue() const{
-    if(sortedSetVKC.empty()){
+    if(sortedSetVK.empty()){
         ;//throw wyjatek
     }
     return (*sortedSetVK.begin())->val;
@@ -163,7 +165,7 @@ const V& PriorityQueue<K,V>::maxValue() const{
     if(sortedSetVK.empty()){
         ;//throw wyjatek
     }
-    return (*sortedSetVKC.rbegin())->val;
+    return (*sortedSetVK.rbegin())->val;
 }
 
 
@@ -264,6 +266,54 @@ void PriorityQueue<K,V>::swap(PriorityQueue<K, V>& queue){
 template<typename K, typename V>
 void swap(PriorityQueue<K,V>& lp, PriorityQueue<K,V>& rp){
     lp.swap(rp);
+}
+
+template<typename K, typename V>
+bool operator<(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs){
+    auto it_lhs = lhs.sortedSetKV.begin();
+    auto it_rhs = rhs.sortedSetKV.begin();
+    while(it_lhs != lhs.sortedSetKV.end() && it_rhs != rhs.sortedSetKV.end()){
+        if((*it_lhs)->key < (*it_rhs)->key)
+            return true;
+        else if((*it_lhs)->key > (*it_rhs)->key)
+            return false;
+        // keys are equal by now ...
+        if((*it_lhs)->val < (*it_rhs)->val)
+            return true;
+        else if((*it_lhs)->val > (*it_rhs)->val)
+            return false;
+        //values are equal if we got here ...
+        ++it_lhs;
+        ++it_rhs;
+    }
+    if(it_lhs == lhs.sortedSetKV.end() && it_rhs != rhs.sortedSetKV.end())
+        return true;
+    return false;
+}
+
+template<typename K, typename V>
+bool operator>(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs){
+    return rhs < lhs;
+}
+
+template<typename K, typename V>
+bool operator==(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs){
+    return !(lhs > rhs) && !(lhs < rhs);
+}
+
+template<typename K, typename V>
+bool operator!=(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs){
+    return !(lhs == rhs);
+}
+
+template<typename K, typename V>
+bool operator<=(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs){
+    return !(lhs > rhs);
+}
+
+template<typename K, typename V>
+bool operator>=(const PriorityQueue<K,V>& lhs, const PriorityQueue<K,V>& rhs){
+    return !(lhs < rhs);
 }
 
 #endif /* PRIORITYQUEUE_HH_ */
