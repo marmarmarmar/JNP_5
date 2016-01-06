@@ -121,6 +121,7 @@ template<typename K, typename V>
 PriorityQueue<K,V>::PriorityQueue(PriorityQueue<K, V>&& queue){
     queue.sortedSetVK.swap(sortedSetVK);
     queue.sortedSetKV.swap(sortedSetKV);
+
 }
 
 /* move assignment operator=(mainly for temporary objects being passed as a
@@ -131,8 +132,12 @@ PriorityQueue<K,V>::PriorityQueue(PriorityQueue<K, V>&& queue){
 template<typename K, typename V>
 PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &&queue){
     if(this != &queue) {
-        PriorityQueue<K,V> new_one(queue);
-        this->swap(new_one);
+        std::cout << " move assignment operator" << std::endl;
+        //this->PriorityQueue<K, V>(queue);
+        //PriorityQueue<K,V> new_one(queue);
+        //this->swap(new_one);
+        queue.sortedSetVK.swap(sortedSetVK);
+        queue.sortedSetKV.swap(sortedSetKV);
     }
     return *this;
 }
@@ -143,6 +148,7 @@ PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &&queue){
 template<typename K, typename V>
 PriorityQueue<K, V>& PriorityQueue<K,V>::operator=(PriorityQueue<K, V> &queue){
     if(this != &queue){
+        std::cout << " copy assignment operator" << std::endl;
         PriorityQueue<K, V> new_one(queue);
         this->swap(new_one);
     }
@@ -293,23 +299,23 @@ void swap(PriorityQueue<K,V>& lp, PriorityQueue<K,V>& rp){
 
 template<typename K, typename V>
 bool PriorityQueue<K,V>::operator<(const PriorityQueue<K,V>& rhs) const{
-    auto it_lhs = sortedSetKV.begin();
+    auto it = sortedSetKV.begin();
     auto it_rhs = rhs.sortedSetKV.begin();
-    while(it_lhs != sortedSetKV.end() && it_rhs != rhs.sortedSetKV.end()){
-        if((*it_lhs)->key < (*it_rhs)->key)
+    while(it != sortedSetKV.end() && it_rhs != rhs.sortedSetKV.end()){
+        if((*it)->key < (*it_rhs)->key)
             return true;
-        else if((*it_lhs)->key > (*it_rhs)->key)
+        else if((*it)->key > (*it_rhs)->key)
             return false;
         // keys are equal by now ...
-        if((*it_lhs)->val < (*it_rhs)->val)
+        if((*it)->val < (*it_rhs)->val)
             return true;
-        else if((*it_lhs)->val > (*it_rhs)->val)
+        else if((*it)->val > (*it_rhs)->val)
             return false;
         //values are equal if we got here ...
-        ++it_lhs;
+        ++it;
         ++it_rhs;
     }
-    if(it_lhs == sortedSetKV.end() && it_rhs != rhs.sortedSetKV.end())
+    if(it == sortedSetKV.end() && it_rhs != rhs.sortedSetKV.end())
         return true;
     return false;
 }

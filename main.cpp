@@ -95,8 +95,7 @@ std::cout << "no co tam" << std::endl;
     S.insert(4, 16);
     std::cout << "tutaj" << std::endl;
     S.merge(T);
-    std::cout << "tutajS " << S.size()  << std::endl;
-     std::cout << "tutajR " << R.size()  << std::endl;
+
     assert(S.size() == 4);
     assert(S.minValue() == 1);
     assert(S.maxValue() == 16);
@@ -106,7 +105,8 @@ std::cout << "no co tam" << std::endl;
     swap(R, T);
     assert(T == S);
     assert(T != R);
-
+    std::cout << "tutajS " << S.size()  << std::endl;
+     std::cout << "tutajR " << R.size()  << std::endl;
     R = std::move(S);
     assert(T != S);
     assert(T == R);
