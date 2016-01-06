@@ -23,11 +23,11 @@ int main() {
     assert(P.minValue() == 13);
 
     PriorityQueue<int, int> Q(f(P));
-
+std::cout << "no co tam" << std::endl;
     Q.deleteMax();
     Q.deleteMin();
     Q.deleteMin();
-
+std::cout << "no co tam" << std::endl;
     assert(Q.empty());
 
     PriorityQueue<int, int> R(Q);
@@ -35,7 +35,7 @@ int main() {
     R.insert(1, 100);
     R.insert(2, 100);
     R.insert(3, 300);
-
+    std::cout << "no co tam" << std::endl;
     PriorityQueue<int, int> S;
     S = R;
 
@@ -86,12 +86,17 @@ int main() {
         assert(!"exception missing!");
     }
 
+    std::cout << "tutaj" << std::endl;
+
     PriorityQueue<int, int> T;
     T.insert(1, 1);
     T.insert(2, 4);
     S.insert(3, 9);
     S.insert(4, 16);
+    std::cout << "tutaj" << std::endl;
     S.merge(T);
+    std::cout << "tutajS " << S.size()  << std::endl;
+     std::cout << "tutajR " << R.size()  << std::endl;
     assert(S.size() == 4);
     assert(S.minValue() == 1);
     assert(S.maxValue() == 16);

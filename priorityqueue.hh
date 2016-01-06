@@ -252,23 +252,29 @@ void PriorityQueue<K,V>::changeValue(const K& key, const V& value){
     insert(key, value);
 }
 
+template<typename K, typename V>
+void printQueue(const PriorityQueue<K,V>& p1, const PriorityQueue<K,V>& p2){
+
+}
 
 template<typename K, typename V>
 void PriorityQueue<K,V>::merge(PriorityQueue<K, V>& queue){
     if(queue.empty())
         return;
     auto it_KV_curr = queue.sortedSetKV.begin();
-    auto it_KV_next = ++it_KV_curr;
+    //auto it_KV_next = ++it_KV_curr;
+    std::cout << "mergeeeeeeeeeeeeeeee" << std::endl;
     while(queue.size() > 0){
+        it_KV_curr = queue.sortedSetKV.begin();
         auto it_VK = queue.sortedSetVK.find(*it_KV_curr);
-
         auto copy_curr_ptr(*it_KV_curr);
         queue.sortedSetKV.erase(it_KV_curr);
         queue.sortedSetVK.erase(it_VK);
         sortedSetVK.insert(copy_curr_ptr);
         sortedSetKV.insert(copy_curr_ptr);
-        it_KV_curr = it_KV_next;
-        ++it_KV_next;
+        //it_KV_curr = it_KV_next;
+        //++it_KV_next;
+
     }
 }
 
