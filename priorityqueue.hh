@@ -4,6 +4,23 @@
 #include <stddef.h>
 #include <memory>
 #include <set>
+#include <exception>
+
+class PriorityQueueEmptyException : public exception{
+    public:
+        virtual const char* what() const throw()
+        {
+            return "PriorityQueue empty exception";
+        }
+};
+
+class PriorityQueueNotFoundException : public exception{
+    public:
+        virtual const char* what() const throw()
+        {
+            return "PriorityQueue not found exception";
+        }
+};
 
 template<typename K, typename V>
 class PriorityQueue{
@@ -153,7 +170,7 @@ void PriorityQueue<K,V>::insert(const K& key, const V& value){
 template<typename K, typename V>
 const V& PriorityQueue<K,V>::minValue() const{
     if(sortedSetVK.empty()){
-        ;//throw wyjatek
+        throw PriorityQueueEmptyException();
     }
     return (*sortedSetVK.begin())->val;
 }
@@ -161,7 +178,7 @@ const V& PriorityQueue<K,V>::minValue() const{
 template<typename K, typename V>
 const V& PriorityQueue<K,V>::maxValue() const{
     if(sortedSetVK.empty()){
-        ;//throw wyjatek
+        throw PriorityQueueEmptyException();
     }
     return (*sortedSetVK.rbegin())->val;
 }
@@ -170,7 +187,7 @@ const V& PriorityQueue<K,V>::maxValue() const{
 template<typename K, typename V>
 const K& PriorityQueue<K,V>::minKey() const{
     if(sortedSetVK.empty()){
-        ;//throw wyjatek
+        throw PriorityQueueEmptyException();
     }
     return (*sortedSetVK.begin())->key;
 }
@@ -178,7 +195,7 @@ const K& PriorityQueue<K,V>::minKey() const{
 template<typename K, typename V>
 const K& PriorityQueue<K,V>::maxKey() const{
     if(sortedSetVK.empty()){
-        ;//throw wyjatek
+        throw PriorityQueueEmptyException();
     }
     return (*sortedSetVK.rbegin())->key;
 }
@@ -220,7 +237,7 @@ void PriorityQueue<K,V>::deleteKey(const K& k){
     ptr->key = k;
     auto it = sortedSetKV.lower_bound(ptr);
     if(it == sortedSetKV.end() || (*it)->key != k){
-        //throw wyjatek
+        throw PriorityQueueNotFoundException();
     }
     // we've found our element with key = k
     // let's make sure we delete only 1 element ...
@@ -246,8 +263,8 @@ void PriorityQueue<K,V>::merge(PriorityQueue<K, V>& queue){
         auto it_VK = queue.sortedSetVK.find(*it_KV_curr);
 
         auto copy_curr_ptr(*it_KV_curr);
-        queue.sortedSetKC.erase(it_KV_curr);
-        queue.sortedSetVKC.erase(it_VK);
+        queue.sortedSetKV.erase(it_KV_curr);
+        queue.sortedSetVK.erase(it_VK);
         sortedSetVK.insert(copy_curr_ptr);
         sortedSetKV.insert(copy_curr_ptr);
         it_KV_curr = it_KV_next;
