@@ -69,11 +69,11 @@ class PriorityQueue {
             const std::shared_ptr<pairKV>& rhs) const noexcept {
                 if (lhs->val < rhs->val)
                     return true;
-                else if (lhs->val > rhs->val)
+                else if (rhs->val < lhs->val)
                     return false;
                 if (lhs->key < rhs->key)
                     return true;
-                else if (lhs->key > rhs->key)
+                else if (rhs->key < lhs->key )
                     return false;
                 return false;
 
@@ -85,11 +85,11 @@ class PriorityQueue {
             const std::shared_ptr<pairKV>& rhs) const noexcept {
                 if (lhs->key < rhs->key)
                     return true;
-                else if (lhs->key > rhs->key)
+                else if (rhs->key < lhs->key)
                     return false;
                 if (lhs->val < rhs->val)
                     return true;
-                else if (lhs->val > rhs->val)
+                else if (rhs->val < lhs->val)
                     return false;
                 return false;
             }
@@ -295,12 +295,12 @@ bool PriorityQueue<K, V>::operator<(const PriorityQueue<K, V>& rhs) const {
 
         if ((*it)->key < (*it_rhs)->key)
             return true;
-        else if ((*it)->key > (*it_rhs)->key)
+        else if ((*it_rhs)->key < (*it)->key)
             return false;
         // keys are equal by now ...
         if ((*it)->val < (*it_rhs)->val)
             return true;
-        else if ((*it)->val > (*it_rhs)->val)
+        else if ((*it_rhs)->val < (*it)->val )
             return false;
         //values are equal if we got here ...
         ++it;
