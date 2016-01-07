@@ -253,7 +253,30 @@ void PriorityQueue<K, V>::changeValue(const K& key, const V& value) {
           (it != sortedSetKV.begin() && (*(--it))->key == key))) {
       throw PriorityQueueNotFoundException();
     }
-    (*it)->val = value;
+
+    auto temp_ptr = *it;
+
+    auto helper_insert_it_1 = sortedSetKV.lower_bound(ptr);
+    auto helper_insert_it_2 = sortedSetVK.lower_bound(ptr);
+
+    helper_insert_it_1 = sortedSetKV.insert(helper_insert_it_1, ptr);
+    helper_insert_it_2 = sortedSetVK.insert(helper_insert_it_2, ptr);
+
+    try {
+
+      auto helper_erase_it_1 = sortedSetKV.lower_bound(temp_ptr);
+      auto helper_erase_it_2 = sortedSetVK.lower_bound(temp_ptr);
+
+      sortedSetKV.erase(helper_erase_it_1);
+      sortedSetVK.erase(helper_erase_it_2);
+
+    } catch (...) {
+
+      sortedSetKV.erase(helper_insert_it_1);
+      sortedSetVK.erase(helper_insert_it_2);
+
+      throw;
+    }
 }
 
 // COMPLEXITY = O(size() + queue.size() * log(size() + queue.size())) 
