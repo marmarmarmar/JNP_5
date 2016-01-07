@@ -66,7 +66,7 @@ class PriorityQueue {
 
         struct compareVK {
             bool operator() (const std::shared_ptr<pairKV>& lhs,
-            const std::shared_ptr<pairKV>& rhs) const noexcept {
+            const std::shared_ptr<pairKV>& rhs) const {
                 if (lhs->val < rhs->val)
                     return true;
                 else if (rhs->val < lhs->val)
@@ -82,7 +82,7 @@ class PriorityQueue {
 
         struct compareKV {
             bool operator() (const std::shared_ptr<pairKV>& lhs,
-            const std::shared_ptr<pairKV>& rhs) const noexcept {
+            const std::shared_ptr<pairKV>& rhs) const {
                 if (lhs->key < rhs->key)
                     return true;
                 else if (rhs->key < lhs->key)
@@ -109,8 +109,15 @@ PriorityQueue<K, V>::PriorityQueue() {
 
 /* copy constructor of map and set has strong exception guarantee */
 template<typename K, typename V>
-PriorityQueue<K, V>::PriorityQueue(const PriorityQueue<K, V>& queue) :
-sortedSetVK(queue.sortedSetVK), sortedSetKV(queue.sortedSetKV) {
+PriorityQueue<K, V>::PriorityQueue(const PriorityQueue<K, V>& queue) {
+  for (auto iterator = queue.sortedSetVK.begin();
+      iterator != queue.sortedSetVK.end();
+      ++iterator) {
+    auto temporary_pointer = std::make_shared<pairKV>(
+        (*iterator)->key, (*iterator)->val);
+    sortedSetVK.insert(sortedSetVK.end(), temporary_pointer);
+    sortedSetKV.insert(temporary_pointer);
+  }
 }
 
 /* move constructor - just swap our empty multisets for the passed queue's
@@ -163,9 +170,11 @@ typename PriorityQueue<K, V>::size_type PriorityQueue<K, V>::size() const {
 template<typename K, typename V>
 void PriorityQueue<K, V>::insert(const K& key, const V& value) {
     auto ptr = std::make_shared<pairKV>(key, value);
-    auto helper_iterator = sortedSetVK.insert(ptr);
+    auto helper_iterator = sortedSetVK.lower_bound(ptr);
+    sortedSetVK.insert(helper_iterator, ptr);
     try {
-      sortedSetKV.insert(ptr);
+      auto helper_iterator_2 = sortedSetKV.lower_bound(ptr);
+      sortedSetKV.insert(helper_iterator_2, ptr);
     } catch (...) {
       sortedSetVK.erase(helper_iterator);
       throw;
@@ -238,13 +247,13 @@ void PriorityQueue<K, V>::changeValue(const K& key, const V& value) {
         std::make_shared<pairKV>(key, value);
 
     auto it = sortedSetKV.lower_bound(ptr);
+
     if (this->empty() ||
         !((it != sortedSetKV.end() && (*it)->key == key) ||
-        (it != sortedSetKV.begin() && (*(--it))->key == key))) {
-        throw PriorityQueueNotFoundException();
+          (it != sortedSetKV.begin() && (*(--it))->key == key))) {
+      throw PriorityQueueNotFoundException();
     }
     (*it)->val = value;
-
 }
 
 // COMPLEXITY = O(size() + queue.size() * log(size() + queue.size())) 
@@ -273,8 +282,8 @@ void PriorityQueue<K, V>::merge(PriorityQueue<K, V>& queue) {
 template<typename K, typename V>
 void PriorityQueue<K, V>::swap(PriorityQueue<K, V>& queue) {
     if (this != &queue) {
-        queue.sortedSetVK.swap(sortedSetVK);
-        queue.sortedSetKV.swap(sortedSetKV);
+      std::swap(queue.sortedSetVK, sortedSetVK);
+      std::swap(queue.sortedSetKV, sortedSetKV);
     }
 }
 
